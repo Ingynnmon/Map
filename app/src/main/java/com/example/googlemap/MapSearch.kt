@@ -5,7 +5,9 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.view.View
@@ -38,9 +40,17 @@ class MapSearch : FragmentActivity(), OnMapReadyCallback, LocationListener, Goog
 
     private lateinit var search : Button
 
+    companion object{
+        val REQUEST_LOCATION_CODE = 95
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.search_layout)
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            checkLocationPermission()
+        }
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -58,6 +68,39 @@ class MapSearch : FragmentActivity(), OnMapReadyCallback, LocationListener, Goog
             //}
         }
     }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+
+        when(requestCode){
+            REQUEST_LOCATION_CODE -> {
+                if(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        if(mGoogleApiClient == null){
+                            buildGoogleApiClient()
+                        }
+                        mMap!!.isMyLocationEnabled = true
+                    }
+                }else{
+                    Toast.makeText(this, "Myanmar", Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+        }
+    }
+
+    fun checkLocationPermission() : Boolean{
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_CODE)
+            }else{
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_CODE)
+            }
+            return  false
+        }else
+            return true
+    }
+
 
     fun searchLocation(view: View) {
 
@@ -131,17 +174,18 @@ class MapSearch : FragmentActivity(), OnMapReadyCallback, LocationListener, Goog
         val latLng = LatLng(location.latitude, location.longitude)
         val markerOptions = MarkerOptions()
         markerOptions.position(latLng)
-        markerOptions.title("Current Position")
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        markerOptions.title("Myanmar")
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
         mCurrLocationMarker = mMap!!.addMarker(markerOptions)
 
         //move map camera
         mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-        mMap!!.animateCamera(CameraUpdateFactory.zoomTo(11f))
+        mMap!!.animateCamera(CameraUpdateFactory.zoomBy(10f))
 
         //stop location updates
         if(mGoogleApiClient != null){
             LocationServices.getFusedLocationProviderClient(this)
+            //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
         }
     }
 

@@ -21,11 +21,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.ArrayList
 import java.util.jar.Manifest
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private lateinit var myPlace:LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +52,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
 
-        var myPlace = LatLng(16.866070, 96.195129)
+       /* var myPlace = LatLng(16.866070, 96.195129)
         mMap.addMarker(MarkerOptions().position(myPlace).title("Yangon"))
 
         myPlace = LatLng(16.809249, 96.131538)
@@ -59,14 +61,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         myPlace = LatLng(21.958828, 96.089104)
         mMap.addMarker(MarkerOptions().position(myPlace).title("Mandalay"))
 
-        myPlace = LatLng(16.883869, 96.196404)
-        mMap.addMarker(MarkerOptions().position(myPlace).title("Pyin Oo Lwin"))
-
         myPlace = LatLng(19.671480, 96.069893)
         mMap.addMarker(MarkerOptions().position(myPlace).title("Nay Pyi Taw"))
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPlace, 12.0f))
+*/
+        var nameList= ArrayList<MapLocation>()
 
+        nameList.add(MapLocation(40.712776,-74.005974,"New York"))
+        nameList.add(MapLocation(35.689487,139.691711,"Tokyo"))
+        nameList.add(MapLocation(35.693840,139.703552,"Shinjuku"))
+        nameList.add(MapLocation(19.671480,96.069893,"Nay Pyi Taw"))
+        nameList.add(MapLocation(16.866070,96.195129,"Yangon"))
+        nameList.add(MapLocation(21.958828,96.089104,"Mandalay"))
+
+
+        for(index in 0..nameList.size-1){
+            myPlace = LatLng(nameList.get(index).latitude,nameList.get(index).longitude)
+            mMap.addMarker(MarkerOptions().position(myPlace).title(nameList.get(index).name))
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPlace, 12.0f))
     }
 
 
